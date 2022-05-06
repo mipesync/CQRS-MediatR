@@ -1,8 +1,8 @@
-﻿using CQRS_MediatR.Models;
+﻿using CQRS_MediatR.API.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace CQRS_MediatR.DBContext
+namespace CQRS_MediatR.API.DBContext
 {
     public partial class AppContext : DbContext
     {

@@ -1,4 +1,4 @@
-namespace CQRS_MediatR.Models
+namespace CQRS_MediatR.API.Models
 {
     public class ErrorViewModel
     {

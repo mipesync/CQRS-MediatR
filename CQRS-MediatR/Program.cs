@@ -4,8 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Microsoft.Data.Sqlite;
-using AppContext = CQRS_MediatR.DBContext.AppContext;
-using CQRS_MediatR;
+using AppContext = CQRS_MediatR.API.DBContext.AppContext;
+using CQRS_MediatR.API;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +35,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers();
-builder.Services.AddMvc();
+builder.Services.AddMvc().WithRazorPagesRoot("/API/Views");
 
 var app = builder.Build();
 

@@ -3,5 +3,5 @@ using MediatR;
 
 namespace CQRS_MediatR.BLL.Commands
 {
-    public record DeleteUserCommand(User User) : IRequest;
+    public record AuthUserCommand(User User) : IRequest<User?>;
 }

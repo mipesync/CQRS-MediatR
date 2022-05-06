@@ -1,8 +1,8 @@
 ﻿using CQRS_MediatR.BLL.Commands;
 using MediatR;
-using AppContext = CQRS_MediatR.DBContext.AppContext;
+using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 
-namespace CQRS_MediatR.BLL.Handlers
+namespace CQRS_MediatR.BLL.Handlers.UserHandlers
 {
     public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, Unit>
     {
@@ -11,9 +11,7 @@ namespace CQRS_MediatR.BLL.Handlers
 
         public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(request.Id);
-
-            _context.Users.Remove(user!);
+            _context.Users.Remove(request.User);
             await _context.SaveChangesAsync();
 
             return Unit.Value;

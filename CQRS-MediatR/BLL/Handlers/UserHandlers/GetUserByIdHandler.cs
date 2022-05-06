@@ -1,10 +1,10 @@
-﻿using CQRS_MediatR.BLL.Queries;
-using CQRS_MediatR.Models;
+﻿using CQRS_MediatR.API.Models;
+using CQRS_MediatR.BLL.Queries;
 using MediatR;
 using Microsoft.Data.Sqlite;
-using AppContext = CQRS_MediatR.DBContext.AppContext;
+using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 
-namespace CQRS_MediatR.BLL.Handlers
+namespace CQRS_MediatR.BLL.Handlers.UserHandlers
 {
     public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, User>
     {

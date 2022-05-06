@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace CQRS_MediatR
+namespace CQRS_MediatR.API
 {
     public class AuthOptions
     {

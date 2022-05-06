@@ -96,7 +96,7 @@ namespace CQRS_MediatR.Controllers
             return View(user);
         }
 
-        [HttpPost("delete/{id}")] //users/delete/id
+        [HttpPost("delete/{id}")] // POST: /users/delete/id
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {

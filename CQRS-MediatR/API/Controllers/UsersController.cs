@@ -31,15 +31,19 @@ namespace CQRS_MediatR.API.Controllers
         {
             var users = _mediator.Send(new GetUsersQuery());
 
+            if (users is null) return NotFound(new {message = "Пользователи не найдены"});
+
             return View($"{viewsUrl}Index.cshtml", users.Result.ToList());
         }
 
         [HttpGet("info/{id}")] // GET: /users/info/id
         public async Task<IActionResult> Details(string id)
         {
-            if (id is null) return BadRequest();
+            if (id is null) return BadRequest(new {message = "id не может быть пустым"});
 
             var user = await _mediator.Send(new GetUserByIdQuery(id));
+
+            if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
             return View($"{viewsUrl}Details.cshtml", user);
         }
@@ -54,21 +58,29 @@ namespace CQRS_MediatR.API.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] User dataUser)
         {
+            if (dataUser is null) return BadRequest();
+
             User user = null;
+
             if (ModelState.IsValid)
             {
                 user = await _mediator.Send(new CreateUserCommand(dataUser));
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
+
+            if (user is null) return BadRequest();
+
             return View($"{viewsUrl}Create.cshtml", user);
         }
 
         [HttpGet("edit/{id}")] // GET: /users/edit/id
         public async Task<IActionResult> Edit(string id)
         {
-            if (id is null) return BadRequest();
+            if (id is null) return BadRequest(new { message = "id не может быть пустым" });
 
             var user = await _mediator.Send(new GetUserByIdQuery(id));
+
+            if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
             return View($"{viewsUrl}Edit.cshtml", user);
         }
@@ -77,23 +89,31 @@ namespace CQRS_MediatR.API.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [FromForm] User dataUser)
         {
+            if (id is null) return BadRequest(new { message = "id не может быть пустым" });
+
+            if (dataUser is null) return BadRequest();
+
             if (id != dataUser.Id) return NotFound();
+
             User user = null!;
 
             if (ModelState.IsValid)
             {
                 user = await _mediator.Send(new UpdateUserCommand(dataUser));
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
+
             return View($"{viewsUrl}Edit.cshtml", user);
         }
 
         [HttpGet("delete/{id}")] // GET: /users/delete/id
         public async Task<IActionResult> Delete(string id)
         {
-            if (id is null) return BadRequest();
+            if (id is null) return BadRequest(new { message = "id не может быть пустым" });
 
             var user = await _mediator.Send(new GetUserByIdQuery(id));
+
+            if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
             return View($"{viewsUrl}Delete.cshtml", user);
         }
@@ -106,9 +126,11 @@ namespace CQRS_MediatR.API.Controllers
 
             var user = await _mediator.Send(new GetUserByIdQuery(id));
 
+            if (user is null) return NotFound(new { message = "Пользователь не найден" });
+
             await _mediator.Send(new DeleteUserCommand(user));
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

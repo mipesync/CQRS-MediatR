@@ -1,0 +1,14 @@
+﻿@model CQRS_MediatR.API.Models.User
+
+@{
+    ViewData["Title"] = "Выход";
+}
+
+<h3>Вы действительно хотите выйти?</h3>
+<div>
+    <form asp-action="LogOut">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Выйти" class="btn btn-danger" /> |
+        <a asp-controller="Users" asp-action="Index">Назад</a>
+    </form>
+</div>

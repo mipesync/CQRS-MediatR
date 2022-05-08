@@ -52,6 +52,15 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseSession();
 
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == 401 || response.StatusCode == 403) response.Redirect("/auth/login");
+
+    if (response.StatusCode == 404) response.Redirect("/error");
+});
+
 app.Use(async (context, next) =>
 {
     var access_token = context.Session.GetString("access_token");

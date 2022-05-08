@@ -19,7 +19,7 @@ namespace CQRS_MediatR.API.Controllers
     public class AuthController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly string viewUrl = "~/API/Views/";
+        private readonly string viewUrl = "~/API/Views/Auth/";
 
         public AuthController(IMediator mediator)
         {
@@ -29,7 +29,7 @@ namespace CQRS_MediatR.API.Controllers
         [HttpGet("login")]
         public ActionResult LogIn()
         {
-            return View($"{viewUrl}Auth/LogIn.cshtml");
+            return View($"{viewUrl}LogIn.cshtml");
         }
 
         [HttpPost("login")]
@@ -37,44 +37,37 @@ namespace CQRS_MediatR.API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            Console.WriteLine(Request.Headers["Authorization"]);
-
             var user = await _mediator.Send(new AuthUserCommand(dataUser));
 
-            if (user is null) return NotFound(new { message = "Неверное имя или пароль" });
+            if (user is null) return BadRequest(new { message = "Неверное имя или пароль" });
 
-            var jwtResponse = await _mediator.Send(new IssueTokenCommand(user, HttpContext));
+            await _mediator.Send(new IssueTokenCommand(user, HttpContext));
 
             return Redirect("~/users");
         }
 
+        [Authorize]
         [HttpGet("logout")]
-        public ActionResult LogOut()
+        public ActionResult LogOutAgree()
         {
-
-            return View($"{viewUrl}Auth/LogOut.cshtml");
+            return View($"{viewUrl}LogOut.cshtml");
         }
 
+        [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> LogOut([FromForm] User dataUser)
+        public IActionResult LogOut()
         {
-            if (!ModelState.IsValid) return BadRequest();
+            HttpContext.Session.Clear();
+            HttpContext.Response.Cookies.Delete("access_token");
+            Response.StatusCode = 401;
 
-            Console.WriteLine(Request.Headers["Authorization"]);
-
-            var user = await _mediator.Send(new AuthUserCommand(dataUser));
-
-            if (user is null) return NotFound(new { message = "Неверное имя или пароль" });
-
-            var jwtResponse = await _mediator.Send(new IssueTokenCommand(user, HttpContext));
-
-            return Redirect("~/users");
+            return RedirectToAction(nameof(LogIn));  // УНИКАЛЬНОСТЬ ЛОГИНА, СОЗДАТЬ ФИЛЬТР ДЛЯ ЛОГИРОВАНИЯ
         }
 
         [HttpGet("sign-up")]
         public ActionResult SignUp()
         {
-            return View($"{viewUrl}Auth/SignUp.cshtml");
+            return View($"{viewUrl}SignUp.cshtml");
         }
 
         [HttpPost("sign-up")]
@@ -82,13 +75,9 @@ namespace CQRS_MediatR.API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            Console.WriteLine(Request.Headers["Authorization"]);
+            var user = await _mediator.Send(new CreateUserCommand(dataUser));
 
-            var user = await _mediator.Send(new AuthUserCommand(dataUser));
-
-            if (user is null) return NotFound(new { message = "Неверное имя или пароль" });
-
-            var jwtResponse = await _mediator.Send(new IssueTokenCommand(user, HttpContext));
+            await _mediator.Send(new IssueTokenCommand(user, HttpContext));
 
             return Redirect("~/users");
         }

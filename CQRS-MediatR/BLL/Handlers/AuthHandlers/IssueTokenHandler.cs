@@ -23,6 +23,7 @@ namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             request.Context.Session.SetString("access_token", encodedJwt);
+            request.Context.Session.SetString("userId", request.User.Id);
             request.Context.Response.Cookies.Append("access_token", encodedJwt);
 
             return Task.FromResult(encodedJwt);

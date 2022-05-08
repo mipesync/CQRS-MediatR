@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CQRS_MediatR.styles.css" asp-append-version="true" />
+    <style>
+
+    </style>
 </head>
 <body>
     <header>
@@ -19,15 +22,16 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 </div>
-                @if (!User.Identity!.IsAuthenticated)
+                @if (Context.Request.Path == "/error") {}
+                else if (!User.Identity!.IsAuthenticated)
                 {
                     <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogIn">Войти</a>
                     <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="SignUp">Регистрация</a>
                 }
                 else
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Users" asp-action="Details">Здравствуйте, @User.Identity.Name | </a>
-                    <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogOut"><font color="#FF1A18">Выйти</font></a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Users" asp-route-id="@Context.Session.GetString("userId")" asp-action="Details">Здравствуйте, @User.Identity.Name</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogOutAgree"><font color="#FF1A18">Выйти</font></a>
                 }
             </div>
         </nav>

@@ -7,7 +7,7 @@
             Id = Guid.NewGuid().ToString();
         }
 
-        public string? Id { get; set; }
+        public string Id { get; set; } = null!;
         public string? Name { get; set; }
         public string Username { get; set; } = null!;
         public string PassHash { get; set; } = null!;

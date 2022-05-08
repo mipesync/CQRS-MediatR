@@ -1,16 +1,21 @@
 ﻿@model CQRS_MediatR.API.Models.User
 
 @{
-    ViewData["Title"] = "Авторизация";
+    ViewData["Title"] = "Регистрация";
 }
 
-<h1>Авторизация</h1>
+<h1>Регистрация</h1>
 
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="LogIn">
+        <form asp-action="SignUp">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Имя</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Username" class="control-label">Логин</label>
                 <input asp-for="Username" class="form-control" />
@@ -23,12 +28,12 @@
             </div>
             <br />
             <div class="form-group">
-                <input type="submit" value="Войти" class="btn btn-primary" />
+                <input type="submit" value="Зарегистрироваться" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="SignUp">Регистрация</a>
+    <a asp-action="LogIn">Назад к авторизации</a>
 </div>

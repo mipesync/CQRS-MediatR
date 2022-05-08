@@ -3,5 +3,5 @@ using MediatR;
 
 namespace CQRS_MediatR.BLL.Commands
 {
-    public record IssueTokenCommand(User User) : IRequest<string>;
+    public record IssueTokenCommand(User User, HttpContext Context) : IRequest<string>;
 }

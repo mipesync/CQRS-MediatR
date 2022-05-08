@@ -33,7 +33,7 @@ namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
                             var id = reader.GetValue(0).ToString();
                             var name = reader.GetValue(1).ToString();
                             var username = reader.GetValue(2).ToString();
-                            var passHash = reader.GetValue(2).ToString();
+                            var passHash = reader.GetValue(3).ToString();
 
                             if (BCrypt.Net.BCrypt.EnhancedVerify(request.User.PassHash, passHash))
                                 user = new User { Id = id, Name = name, Username = username!, PassHash = passHash! };

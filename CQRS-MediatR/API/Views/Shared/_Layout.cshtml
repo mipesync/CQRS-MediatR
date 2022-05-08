@@ -19,8 +19,16 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 </div>
-                <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogIn">Войти</a>
-                <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="SignUp">Регистрация</a>
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogIn">Войти</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="SignUp">Регистрация</a>
+                }
+                else
+                {
+                    <a class="navbar-brand" asp-area="" asp-controller="Users" asp-action="Details">Здравствуйте, @User.Identity.Name | </a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Auth" asp-action="LogOut"><font color="#FF1A18">Выйти</font></a>
+                }
             </div>
         </nav>
     </header>

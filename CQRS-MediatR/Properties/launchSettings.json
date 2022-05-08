@@ -13,7 +13,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7277;http://localhost:5277",
-      "launchUrl": "users/get",
+      "launchUrl": "auth/login",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

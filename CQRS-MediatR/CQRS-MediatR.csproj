@@ -93,4 +93,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="API\Views\Home\" />
+  </ItemGroup>
+
 </Project>

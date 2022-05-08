@@ -5,6 +5,7 @@ using CQRS_MediatR.API.Models;
 using CQRS_MediatR.BLL.Commands;
 using CQRS_MediatR.BLL.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +13,20 @@ using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 
 namespace CQRS_MediatR.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("users")]
     public class UsersController : Controller
     {
-        private readonly AppContext _context;
         private readonly IMediator _mediator;
         private readonly string viewsUrl = "~/API/Views/Users/";
 
-        public UsersController(AppContext context, IMediator mediator)
+        public UsersController(IMediator mediator)
         {
-            _context = context;
             _mediator = mediator;
         }
 
-        [HttpGet("get")] // GET: /users/get
+        [HttpGet] // GET: /users
         public IActionResult Index()
         {
             var users = _mediator.Send(new GetUsersQuery());

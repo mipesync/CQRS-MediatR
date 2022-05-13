@@ -1,7 +1,9 @@
 ﻿#nullable disable
+using System.Diagnostics.CodeAnalysis;
 using CQRS_MediatR;
 using CQRS_MediatR.API.Models;
 using CQRS_MediatR.BLL.Commands;
+using CQRS_MediatR.BLL.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
+using CQRS_MediatR.API.Filters;
 using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 
 namespace CQRS_MediatR.API.Controllers
@@ -26,58 +30,65 @@ namespace CQRS_MediatR.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("login")]
+        [HttpGet("login")] // GET: /auth/login
         public ActionResult LogIn()
         {
             return View($"{viewUrl}LogIn.cshtml");
         }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> LogIn([FromForm] User dataUser)
+        
+        [Logging]
+        [HttpPost("login")] // POST: /auth/login
+        public async Task<IActionResult> LogIn([FromForm] User dataUser) // Авторизация
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(); // Проверка модели их формы на валидность
 
-            var user = await _mediator.Send(new AuthUserCommand(dataUser));
+            var user = await _mediator.Send(new GetUserByUsernameQuery(dataUser)); // Получение юзера по username
 
-            if (user is null) return BadRequest(new { message = "Неверное имя или пароль" });
+            if (user is null) return BadRequest(new { message = "Неверное имя пользователя" });
 
-            await _mediator.Send(new IssueTokenCommand(user, HttpContext));
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(dataUser.PassHash, user.PassHash))
+                    return BadRequest(new { message = "Неверный пароль пользователя" }); // Проверка соли пароля
+
+            await _mediator.Send(new IssueTokenCommand(user, HttpContext)); // Издание токена JWT
 
             return Redirect("~/users");
         }
 
         [Authorize]
-        [HttpGet("logout")]
-        public ActionResult LogOutAgree()
+        [HttpGet("logout")] // GET: /auth/logout
+        public ActionResult LogOut()
         {
             return View($"{viewUrl}LogOut.cshtml");
         }
 
         [Authorize]
-        [HttpPost("logout")]
-        public IActionResult LogOut()
+        [HttpPost("logout")] // POST: /auth/logout
+        public IActionResult LogOutConfirmed() // Выход из системы
         {
             HttpContext.Session.Clear();
             HttpContext.Response.Cookies.Delete("access_token");
             Response.StatusCode = 401;
 
-            return RedirectToAction(nameof(LogIn));  // УНИКАЛЬНОСТЬ ЛОГИНА, СОЗДАТЬ ФИЛЬТР ДЛЯ ЛОГИРОВАНИЯ
+            return RedirectToAction(nameof(LogIn));
         }
 
-        [HttpGet("sign-up")]
+        [HttpGet("sign-up")] // GET: /auth/sign-up
         public ActionResult SignUp()
         {
             return View($"{viewUrl}SignUp.cshtml");
         }
 
-        [HttpPost("sign-up")]
-        public async Task<IActionResult> SignUp([FromForm] User dataUser)
+        [HttpPost("sign-up")] // POST: /auth/sign-up
+        public async Task<IActionResult> SignUp([FromForm] User dataUser) // Регистрация
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var user = await _mediator.Send(new CreateUserCommand(dataUser));
+            if (await _mediator.Send(new GetUserByUsernameQuery(dataUser)) is not null) // Проверка занятости логина
+                return BadRequest(new { message = "Имя пользователя занято!" });
 
-            await _mediator.Send(new IssueTokenCommand(user, HttpContext));
+            var user = await _mediator.Send(new CreateUserCommand(dataUser)); // Создание юзера и хеширование + соление пароля
+
+            await _mediator.Send(new IssueTokenCommand(user, HttpContext)); // Издание токена JWT
 
             return Redirect("~/users");
         }

@@ -6,11 +6,16 @@ using System.Reflection;
 using Microsoft.Data.Sqlite;
 using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 using CQRS_MediatR.API;
+using CQRS_MediatR.API.Controllers;
+using CQRS_MediatR.API.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +41,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers();
-builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
@@ -71,8 +75,16 @@ app.Use(async (context, next) =>
     await next();
 });
 
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    await next.Invoke();
+    var statusCode = context.Response.StatusCode;
+});
+
 app.MapControllers();
 
 app.Run();

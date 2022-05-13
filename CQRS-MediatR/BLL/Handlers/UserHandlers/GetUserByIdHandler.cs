@@ -8,12 +8,9 @@ namespace CQRS_MediatR.BLL.Handlers.UserHandlers
 {
     public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, User>
     {
-        private readonly AppContext _context;
         private readonly string _connection = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
             .Build().GetSection("ConnectionStrings:Sqlite").Value;
-
-        public GetUserByIdHandler(AppContext context) => _context = context;
 
         public Task<User> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {

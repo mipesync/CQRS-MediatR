@@ -1,21 +1,18 @@
 ﻿using CQRS_MediatR.API.Models;
-using CQRS_MediatR.BLL.Commands;
+using CQRS_MediatR.BLL.Queries;
 using MediatR;
 using Microsoft.Data.Sqlite;
 using AppContext = CQRS_MediatR.API.DBContext.AppContext;
 
-namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
+namespace CQRS_MediatR.BLL.Handlers.UserHandlers
 {
-    public class AuthUserHandler : IRequestHandler<AuthUserCommand, User?>
+    public class GetUserByUsernameHandler : IRequestHandler<GetUserByUsernameQuery, User?>
     {
-        private readonly AppContext _context;
         private readonly string _connection = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
             .Build().GetSection("ConnectionStrings:Sqlite").Value;
 
-        public AuthUserHandler(AppContext context) => _context = context;
-
-        public Task<User?> Handle(AuthUserCommand request, CancellationToken cancellationToken)
+        public Task<User?> Handle(GetUserByUsernameQuery request, CancellationToken cancellationToken)
         {
             User? user = null;
             var sqlExpression = $"SELECT * FROM Users WHERE Username='{request.User.Username}'";
@@ -35,8 +32,7 @@ namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
                             var username = reader.GetValue(2).ToString();
                             var passHash = reader.GetValue(3).ToString();
 
-                            if (BCrypt.Net.BCrypt.EnhancedVerify(request.User.PassHash, passHash))
-                                user = new User { Id = id, Name = name, Username = username!, PassHash = passHash! };
+                            user = new User { Id = id!, Name = name, Username = username!, PassHash = passHash! };
                         }
                     }
                 }

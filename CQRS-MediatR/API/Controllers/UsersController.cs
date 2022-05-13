@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using System.Diagnostics.CodeAnalysis;
 using CQRS_MediatR;
 using CQRS_MediatR.API.DBContext;
 using CQRS_MediatR.API.Models;
@@ -16,6 +17,7 @@ namespace CQRS_MediatR.API.Controllers
     [Authorize]
     [ApiController]
     [Route("users")]
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class UsersController : Controller
     {
         private readonly IMediator _mediator;
@@ -27,9 +29,9 @@ namespace CQRS_MediatR.API.Controllers
         }
 
         [HttpGet] // GET: /users
-        public IActionResult Index()
+        public IActionResult Index() // "Главная" страница
         {
-            var users = _mediator.Send(new GetUsersQuery());
+            var users = _mediator.Send(new GetUsersQuery()); // Получение всех юзеров
 
             if (users is null) return NotFound(new {message = "Пользователи не найдены"});
 
@@ -37,11 +39,11 @@ namespace CQRS_MediatR.API.Controllers
         }
 
         [HttpGet("info/{id}")] // GET: /users/info/id
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(string id) // Информация о юзере
         {
             if (id is null) return BadRequest(new {message = "id не может быть пустым"});
 
-            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            var user = await _mediator.Send(new GetUserByIdQuery(id)); // Получение юзера по id
 
             if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
@@ -56,7 +58,7 @@ namespace CQRS_MediatR.API.Controllers
 
         [HttpPost("create")] // POST: /users/create
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromForm] User dataUser)
+        public async Task<IActionResult> Create([FromForm] User dataUser) // Добавление юзера
         {
             if (dataUser is null) return BadRequest();
 
@@ -64,7 +66,7 @@ namespace CQRS_MediatR.API.Controllers
 
             if (ModelState.IsValid)
             {
-                user = await _mediator.Send(new CreateUserCommand(dataUser));
+                user = await _mediator.Send(new CreateUserCommand(dataUser)); // Создание юзера и хеширование + соление пароля
                 return RedirectToAction(nameof(Index));
             }
 
@@ -78,7 +80,7 @@ namespace CQRS_MediatR.API.Controllers
         {
             if (id is null) return BadRequest(new { message = "id не может быть пустым" });
 
-            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            var user = await _mediator.Send(new GetUserByIdQuery(id)); // Вывод юзера, которого будем редачить
 
             if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
@@ -87,7 +89,7 @@ namespace CQRS_MediatR.API.Controllers
 
         [HttpPost("edit/{id}")] // POST: /users/edit/id
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [FromForm] User dataUser)
+        public async Task<IActionResult> Edit(string id, [FromForm] User dataUser) // Редактирование юзера
         {
             if (id is null) return BadRequest(new { message = "id не может быть пустым" });
 
@@ -99,7 +101,7 @@ namespace CQRS_MediatR.API.Controllers
 
             if (ModelState.IsValid)
             {
-                user = await _mediator.Send(new UpdateUserCommand(dataUser));
+                user = await _mediator.Send(new UpdateUserCommand(dataUser)); // Обновление данных в БД
                 return RedirectToAction(nameof(Index));
             }
 
@@ -111,7 +113,7 @@ namespace CQRS_MediatR.API.Controllers
         {
             if (id is null) return BadRequest(new { message = "id не может быть пустым" });
 
-            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            var user = await _mediator.Send(new GetUserByIdQuery(id)); // Вывод юзера, которого будем удалять
 
             if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
@@ -124,11 +126,11 @@ namespace CQRS_MediatR.API.Controllers
         {
             if (id is null) return BadRequest();
 
-            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            var user = await _mediator.Send(new GetUserByIdQuery(id)); // Получение юзера по id
 
             if (user is null) return NotFound(new { message = "Пользователь не найден" });
 
-            await _mediator.Send(new DeleteUserCommand(user));
+            await _mediator.Send(new DeleteUserCommand(user)); // Удаление юзера из БД
 
             return RedirectToAction(nameof(Index));
         }

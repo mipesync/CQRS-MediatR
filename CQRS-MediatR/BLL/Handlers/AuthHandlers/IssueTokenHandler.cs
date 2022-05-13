@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
+namespace CQRS_MediatR.BLL.Handlers.UserHandlers
 {
     public class IssueTokenHandler : IRequestHandler<IssueTokenCommand, string>
     {
@@ -25,6 +25,7 @@ namespace CQRS_MediatR.BLL.Handlers.AuthHandlers
             request.Context.Session.SetString("access_token", encodedJwt);
             request.Context.Session.SetString("userId", request.User.Id);
             request.Context.Response.Cookies.Append("access_token", encodedJwt);
+            request.Context.Response.Headers["access_token"] = encodedJwt;
 
             return Task.FromResult(encodedJwt);
         }

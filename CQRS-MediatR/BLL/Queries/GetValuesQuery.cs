@@ -5,4 +5,5 @@ namespace CQRS_MediatR.BLL.Queries
 {
     public record GetUsersQuery() : IRequest<List<User>>;
     public record GetUserByIdQuery(string id) : IRequest<User>;
+    public record GetUserByUsernameQuery(User User) : IRequest<User>;
 }

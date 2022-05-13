@@ -21,7 +21,8 @@ public class LoggingAttribute : Attribute, IResultFilter
             "Cookie: " + context.HttpContext.Request.Headers.Cookie,
             "Method: " + context.HttpContext.Request.Method,
             "Path: " + context.HttpContext.Request.Path,
-            "ContentType: " + context.HttpContext.Request.ContentType
+            "ContentType: " + context.HttpContext.Request.ContentType,
+            "Date: " + DateTime.Now.ToString()
         };
 
         foreach (var elem in requests)
@@ -42,7 +43,8 @@ public class LoggingAttribute : Attribute, IResultFilter
         {
             "User-Agent: " + context.HttpContext.Response.Headers.UserAgent,
             "Cookie: " + context.HttpContext.Response.Headers["access_token"],
-            "StatusCode: " + context.HttpContext.Response.StatusCode
+            "StatusCode: " + (context.HttpContext.Response.StatusCode == 302 ? 200 : context.HttpContext.Response.StatusCode),
+            "Date: " + DateTime.Now.ToString()
         };
 
         foreach (var elem in responses)

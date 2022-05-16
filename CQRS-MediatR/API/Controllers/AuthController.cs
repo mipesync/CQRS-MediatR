@@ -31,8 +31,9 @@ namespace CQRS_MediatR.API.Controllers
         }
 
         [HttpGet("login")] // GET: /auth/login
-        public ActionResult LogIn()
+        public IActionResult LogIn()
         {
+            if (User.Identity.IsAuthenticated) return Redirect("~/users");
             return View($"{viewUrl}LogIn.cshtml");
         }
         
@@ -75,6 +76,7 @@ namespace CQRS_MediatR.API.Controllers
         [HttpGet("sign-up")] // GET: /auth/sign-up
         public ActionResult SignUp()
         {
+            if (User.Identity.IsAuthenticated) return Redirect("~/users");
             return View($"{viewUrl}SignUp.cshtml");
         }
 

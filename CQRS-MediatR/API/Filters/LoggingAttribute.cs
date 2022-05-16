@@ -1,8 +1,9 @@
 ﻿using CQRS_MediatR.API.Controllers;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Moq;
 using NuGet.Protocol;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace CQRS_MediatR.API.Filters;
 
@@ -12,46 +13,82 @@ public class LoggingAttribute : Attribute, IResultFilter
     {
         var _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthController>>();
 
-        string request = "Request:";
+        var request = context.HttpContext.Request;
+
+        string requestStr = "Request:";
+        string bodyStr = "";
+
+        using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+        {
+            bodyStr = reader.ReadToEnd();
+        }
 
         List<string> requests = new List<string>
         {
-            "User-Agent: " + context.HttpContext.Request.Headers.UserAgent,
-            "Protocol: " + context.HttpContext.Request.Protocol,
-            "Cookie: " + context.HttpContext.Request.Headers.Cookie,
-            "Method: " + context.HttpContext.Request.Method,
-            "Path: " + context.HttpContext.Request.Path,
-            "ContentType: " + context.HttpContext.Request.ContentType,
+            "User-Agent: " + request.Headers.UserAgent,
+            "Protocol: " + request.Protocol,
+            "Cookie: " + request.Headers.Cookie,
+            "Method: " + request.Method,
+            "Path: " + request.Path,
+            "ContentType: " + request.ContentType,
+            "Body: " + bodyStr,
             "Date: " + DateTime.Now.ToString()
         };
 
         foreach (var elem in requests)
         {
-            request += $"\n\t{elem}";
+            requestStr += $"\n\t{elem}";
         }
 
-         _logger.LogInformation(request);
+        _logger.LogInformation(requestStr);
+
+        using (var writer = new StreamWriter("log.txt", true))
+        {
+            writer.Write($"----------------\n{request}\n");
+        }
     }
 
     public void OnResultExecuted(ResultExecutedContext context)
     {
         var _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthController>>();
 
-        string response = "Response:";
+        var response = context.HttpContext.Response;
+
+        string responseStr = "Response:";
 
         List<string> responses = new List<string>
         {
-            "User-Agent: " + context.HttpContext.Response.Headers.UserAgent,
-            "Cookie: " + context.HttpContext.Response.Headers["access_token"],
-            "StatusCode: " + (context.HttpContext.Response.StatusCode == 302 ? 200 : context.HttpContext.Response.StatusCode),
+            "Cookie: " + response.Headers["access_token"],
+            "StatusCode: " + (response.StatusCode == 302 ? 200 : response.StatusCode),
+            "Body: " + ResultDeserialize(context.Result.ToJson()),
             "Date: " + DateTime.Now.ToString()
         };
 
         foreach (var elem in responses)
         {
-            response += $"\n\t{elem}";
+            responseStr += $"\n\t{elem}";
         }
 
-        _logger.LogInformation(response);
+        _logger.LogInformation(responseStr);
+
+        using (var writer = new StreamWriter("log.txt", true))
+        {
+            writer.Write($"\n{response}\n----------------\n");
+        }
+    }
+
+    private string ResultDeserialize(string json)
+    {
+        var resultContent = json.Substring(2, json.Length - 4).Replace("\"", "").Split(",");
+        var responseBody = "";
+
+        foreach (var elem in resultContent)
+        {
+            if (Regex.IsMatch(elem, "message"))
+                responseBody = elem.Substring(6);
+            else if (Regex.IsMatch(elem, "Url"))
+                responseBody = elem.Substring(4);
+        }
+        return responseBody;
     }
 }

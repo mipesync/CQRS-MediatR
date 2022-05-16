@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,12 @@ app.UseStatusCodePages(async context =>
     if (response.StatusCode == 404) response.Redirect("/error");
 });
 
+app.Use((context, next) =>
+{
+    context.Request.EnableBuffering();
+    return next();
+});
+
 app.Use(async (context, next) =>
 {
     var access_token = context.Session.GetString("access_token");
@@ -74,7 +81,6 @@ app.Use(async (context, next) =>
     }
     await next();
 });
-
 
 app.UseAuthentication();
 app.UseAuthorization();

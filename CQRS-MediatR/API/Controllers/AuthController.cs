@@ -41,7 +41,7 @@ namespace CQRS_MediatR.API.Controllers
         [HttpPost("login")] // POST: /auth/login
         public async Task<IActionResult> LogIn([FromForm] User dataUser) // Авторизация
         {
-            if (!ModelState.IsValid) return BadRequest(); // Проверка модели их формы на валидность
+            if (!ModelState.IsValid) return BadRequest(); // Проверка модели из формы на валидность
 
             var user = await _mediator.Send(new GetUserByUsernameQuery(dataUser)); // Получение юзера по username
 

@@ -37,3 +37,8 @@
 <div>
     <a asp-action="LogIn">Назад к авторизации</a>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

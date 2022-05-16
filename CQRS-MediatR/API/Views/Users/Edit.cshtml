@@ -40,8 +40,7 @@
     <a asp-action="Index">Назад к списку</a>
 </div>
 
-@* ReSharper disable once Razor.SectionNotResolved *@
 @section Scripts {
-    @{ // ReSharper disable once Mvc.PartialViewNotResolved
+    @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

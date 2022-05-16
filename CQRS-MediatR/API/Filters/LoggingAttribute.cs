@@ -44,7 +44,7 @@ public class LoggingAttribute : Attribute, IResultFilter
 
         using (var writer = new StreamWriter("log.txt", true))
         {
-            writer.Write($"----------------\n{request}\n");
+            writer.Write($"----------------\n{requestStr}\n");
         }
     }
 
@@ -73,7 +73,7 @@ public class LoggingAttribute : Attribute, IResultFilter
 
         using (var writer = new StreamWriter("log.txt", true))
         {
-            writer.Write($"\n{response}\n----------------\n");
+            writer.Write($"\n{responseStr}\n----------------\n");
         }
     }
 

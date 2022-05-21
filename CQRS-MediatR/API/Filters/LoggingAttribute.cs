@@ -94,6 +94,6 @@ public class LoggingAttribute : Attribute, IResultFilter
         if (method == "GET")
             return _serviceProvider.GetService(typeof(ConsoleLogger)) as ILogger;
         else
-            return _serviceProvider.GetService(typeof(FileLogger)) as ILogger;
+            return _serviceProvider.GetService(typeof(CombinedLogger)) as ILogger;
     }
 }

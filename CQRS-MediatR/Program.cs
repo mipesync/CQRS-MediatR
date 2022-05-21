@@ -1,24 +1,13 @@
+using CQRS_MediatR.API;
+using CQRS_MediatR.API.Filters;
+using CQRS_MediatR.API.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
-using Microsoft.Data.Sqlite;
+using ILogger = CQRS_MediatR.API.Logging.ILogger;
 using AppContext = CQRS_MediatR.API.DBContext.AppContext;
-using CQRS_MediatR.API;
-using CQRS_MediatR.API.Controllers;
-using CQRS_MediatR.API.Filters;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO.Compression;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using CQRS_MediatR.API.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +35,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers(options => options.Filters.Add(typeof(LoggingAttribute)));
 builder.Services.AddTransient<ConsoleLogger>();
 builder.Services.AddTransient<FileLogger>();
+builder.Services.AddTransient<CombinedLogger>();
 
 builder.Services.AddSession(options =>
 {

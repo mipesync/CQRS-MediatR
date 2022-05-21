@@ -16,7 +16,7 @@ public class LoggingAttribute : Attribute, IResultFilter
     public void OnResultExecuting(ResultExecutingContext context)
     {
         _serviceProvider = context.HttpContext.RequestServices.GetRequiredService<IServiceProvider>();
-        _logger = GetLogging(context.HttpContext.Request.Method)!;
+        _logger = GetLogger(context.HttpContext.Request.Method)!;
 
         var request = context.HttpContext.Request;
 
@@ -45,7 +45,7 @@ public class LoggingAttribute : Attribute, IResultFilter
     public void OnResultExecuted(ResultExecutedContext context)
     {
         _serviceProvider = context.HttpContext.RequestServices.GetRequiredService<IServiceProvider>();
-        _logger = GetLogging(context.HttpContext.Request.Method)!;
+        _logger = GetLogger(context.HttpContext.Request.Method)!;
 
         var response = context.HttpContext.Response;
 
@@ -89,7 +89,7 @@ public class LoggingAttribute : Attribute, IResultFilter
         return responseBody;
     }
 
-    private ILogger? GetLogging(string method)
+    private ILogger? GetLogger(string method)
     {
         if (method == "GET")
             return _serviceProvider.GetService(typeof(ConsoleLogger)) as ILogger;

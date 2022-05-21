@@ -66,7 +66,7 @@ namespace CQRS_MediatR.API.Controllers
             if (ModelState.IsValid)
             {
                 user = await _mediator.Send(new CreateUserCommand(dataUser)); // Создание юзера и хеширование + соление пароля
-                return RedirectToAction(nameof(Index));
+                return Redirect("~/users");
             }
 
             if (user is null) return BadRequest();
@@ -88,18 +88,18 @@ namespace CQRS_MediatR.API.Controllers
         [IdVerify]
         [HttpPost("edit/{id}")] // POST: /users/edit/id
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [FromForm] User dataUser) // Редактирование юзера
+        public async Task<IActionResult> Edit(string id, [FromForm] UserDto userDto) // Редактирование юзера
         {
-            if (dataUser is null) return BadRequest();
+            if (userDto is null) return BadRequest();
 
-            if (id != dataUser.Id) return NotFound();
+            if (id != userDto.Id) return NotFound();
 
-            User user = null!;
+            User user = await _mediator.Send(new GetUserByIdQuery(id));
 
             if (ModelState.IsValid)
             {
-                user = await _mediator.Send(new UpdateUserCommand(dataUser)); // Обновление данных в БД
-                return RedirectToAction(nameof(Index));
+                user = await _mediator.Send(new UpdateUserCommand(userDto, user)); // Обновление данных в БД
+                return Redirect("~/users");
             }
 
             return View($"{viewsUrl}Edit.cshtml", user);
@@ -127,7 +127,15 @@ namespace CQRS_MediatR.API.Controllers
 
             await _mediator.Send(new DeleteUserCommand(user)); // Удаление юзера из БД
 
-            return RedirectToAction(nameof(Index));
+            return Redirect("~/users");
+        }
+
+        public class UserDto
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Username { get; set; }
+            public string PassHash { get; set; }
         }
     }
 }

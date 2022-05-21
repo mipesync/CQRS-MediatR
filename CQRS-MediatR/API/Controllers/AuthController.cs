@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using CQRS_MediatR.API.Filters;
 using AppContext = CQRS_MediatR.API.DBContext.AppContext;
+using CQRS_MediatR.API.Logging;
 
 namespace CQRS_MediatR.API.Controllers
 {
@@ -23,11 +24,13 @@ namespace CQRS_MediatR.API.Controllers
     public class AuthController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly IServiceProvider _serviceProvider;
         private readonly string viewUrl = "~/API/Views/Auth/";
 
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator, IServiceProvider serviceProvider)
         {
             _mediator = mediator;
+            _serviceProvider = serviceProvider;
         }
 
         [HttpGet("login")] // GET: /auth/login
@@ -37,7 +40,6 @@ namespace CQRS_MediatR.API.Controllers
             return View($"{viewUrl}LogIn.cshtml");
         }
         
-        [Logging]
         [HttpPost("login")] // POST: /auth/login
         public async Task<IActionResult> LogIn([FromForm] User dataUser) // Авторизация
         {
@@ -70,7 +72,9 @@ namespace CQRS_MediatR.API.Controllers
             HttpContext.Response.Cookies.Delete("access_token");
             Response.StatusCode = 401;
 
-            return RedirectToAction(nameof(LogIn));
+            var user = User.Identity.Name;
+
+            return Redirect("~/auth/login");
         }
 
         [HttpGet("sign-up")] // GET: /auth/sign-up

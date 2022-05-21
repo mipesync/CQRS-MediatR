@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using CQRS_MediatR.API.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +43,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add(typeof(LoggingAttribute)));
+builder.Services.AddTransient<ConsoleLogger>();
+builder.Services.AddTransient<FileLogger>();
 
 builder.Services.AddSession(options =>
 {
@@ -66,15 +70,9 @@ app.UseStatusCodePages(async context =>
     if (response.StatusCode == 404) response.Redirect("/error");
 });
 
-app.Use((context, next) =>
-{
-    context.Request.EnableBuffering();
-    return next();
-});
-
 app.Use(async (context, next) =>
 {
-    var access_token = context.Session.GetString("access_token");
+    var access_token = context.Request.Cookies["access_token"];
     if (!string.IsNullOrEmpty(access_token))
     {
         context.Request.Headers.Add("Authorization", "Bearer " + access_token);

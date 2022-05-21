@@ -1,66 +1,68 @@
-﻿using CQRS_MediatR.API.Controllers;
+﻿using CQRS_MediatR.API.Logging;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 using NuGet.Protocol;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using ILogger = CQRS_MediatR.API.Logging.ILogger;
 
 namespace CQRS_MediatR.API.Filters;
 
 public class LoggingAttribute : Attribute, IResultFilter
 {
+    private IServiceProvider _serviceProvider = null!;
+    private ILogger _logger = null!;
+
     public void OnResultExecuting(ResultExecutingContext context)
     {
-        var _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthController>>();
+        _serviceProvider = context.HttpContext.RequestServices.GetRequiredService<IServiceProvider>();
+        _logger = GetLogging(context.HttpContext.Request.Method)!;
 
         var request = context.HttpContext.Request;
 
         string requestStr = "Request:";
-        string bodyStr = "";
-
-        using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
-        {
-            bodyStr = reader.ReadToEnd();
-        }
 
         List<string> requests = new List<string>
-        {
-            "User-Agent: " + request.Headers.UserAgent,
-            "Protocol: " + request.Protocol,
-            "Cookie: " + request.Headers.Cookie,
-            "Method: " + request.Method,
-            "Path: " + request.Path,
-            "ContentType: " + request.ContentType,
-            "Body: " + bodyStr,
-            "Date: " + DateTime.Now.ToString()
-        };
+            {
+                "User-Agent: " + request.Headers.UserAgent,
+                "Protocol: " + request.Protocol,
+                "Cookie: " + request.Headers.Cookie,
+                "Method: " + request.Method,
+                "Path: " + request.Path,
+                "ContentType: " + request.ContentType,
+                "Date: " + DateTime.Now.ToString()
+            };
 
         foreach (var elem in requests)
         {
             requestStr += $"\n\t{elem}";
         }
 
-        _logger.LogInformation(requestStr);
+        _logger.LogInfo(requestStr);
 
-        using (var writer = new StreamWriter("log.txt", true))
-        {
-            writer.Write($"----------------\n{requestStr}\n");
-        }
     }
 
     public void OnResultExecuted(ResultExecutedContext context)
     {
-        var _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthController>>();
+        _serviceProvider = context.HttpContext.RequestServices.GetRequiredService<IServiceProvider>();
+        _logger = GetLogging(context.HttpContext.Request.Method)!;
 
         var response = context.HttpContext.Response;
 
         string responseStr = "Response:";
 
+        string? body = null;
+        try
+        {
+            body = context.Result.ToJson();
+        }
+        catch (JsonSerializationException) { body = "{ message:Deserialize error }"; }
+
         List<string> responses = new List<string>
         {
             "Cookie: " + response.Headers["access_token"],
             "StatusCode: " + (response.StatusCode == 302 ? 200 : response.StatusCode),
-            "Body: " + ResultDeserialize(context.Result.ToJson()),
+            "Body: " + ResultDeserialize(body),
             "Date: " + DateTime.Now.ToString()
         };
 
@@ -69,26 +71,29 @@ public class LoggingAttribute : Attribute, IResultFilter
             responseStr += $"\n\t{elem}";
         }
 
-        _logger.LogInformation(responseStr);
-
-        using (var writer = new StreamWriter("log.txt", true))
-        {
-            writer.Write($"\n{responseStr}\n----------------\n");
-        }
+        _logger.LogInfo(responseStr);
     }
 
-    private string ResultDeserialize(string json)
+    private static string ResultDeserialize(string? json)
     {
+        if (json is null) return json!;
+
         var resultContent = json.Substring(2, json.Length - 4).Replace("\"", "").Split(",");
         var responseBody = "";
 
         foreach (var elem in resultContent)
         {
-            if (Regex.IsMatch(elem, "message"))
-                responseBody = elem.Substring(6);
-            else if (Regex.IsMatch(elem, "Url"))
-                responseBody = elem.Substring(4);
+            if (Regex.IsMatch(elem, "message") || Regex.IsMatch(elem, "Url:") || Regex.IsMatch(elem, "ViewName"))
+                responseBody = elem.Substring(elem.IndexOf(':') + 1);
         }
         return responseBody;
+    }
+
+    private ILogger? GetLogging(string method)
+    {
+        if (method == "GET")
+            return _serviceProvider.GetService(typeof(ConsoleLogger)) as ILogger;
+        else
+            return _serviceProvider.GetService(typeof(FileLogger)) as ILogger;
     }
 }

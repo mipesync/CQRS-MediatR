@@ -68,7 +68,6 @@ namespace CQRS_MediatR.API.Controllers
         [HttpPost("logout")] // POST: /auth/logout
         public IActionResult LogOutConfirmed() // Выход из системы
         {
-            HttpContext.Session.Clear();
             HttpContext.Response.Cookies.Delete("access_token");
             Response.StatusCode = 401;
 

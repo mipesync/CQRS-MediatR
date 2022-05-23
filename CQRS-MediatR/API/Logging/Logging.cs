@@ -1,14 +1,11 @@
-﻿using CQRS_MediatR.API.Logging;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using NuGet.Protocol;
-using System.Text.Json;
 using System.Text.RegularExpressions;
-using ILogger = CQRS_MediatR.API.Logging.ILogger;
 
-namespace CQRS_MediatR.API.Filters;
+namespace CQRS_MediatR.API.Logging;
 
-public class LoggingAttribute : Attribute, IResultFilter
+public class Logging : IResultFilter
 {
     private IServiceProvider _serviceProvider = null!;
     private ILogger _logger = null!;
@@ -79,14 +76,13 @@ public class LoggingAttribute : Attribute, IResultFilter
         if (json is null) return json!;
 
         var resultContent = json.Substring(2, json.Length - 4).Replace("\"", "").Split(",");
-        var responseBody = "";
 
         foreach (var elem in resultContent)
         {
             if (Regex.IsMatch(elem, "message") || Regex.IsMatch(elem, "Url:") || Regex.IsMatch(elem, "ViewName"))
-                responseBody = elem.Substring(elem.IndexOf(':') + 1);
+                 return elem.Substring(elem.IndexOf(':') + 1);
         }
-        return responseBody;
+        return null!;
     }
 
     private ILogger? GetLogger(string method)

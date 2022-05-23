@@ -1,5 +1,4 @@
 using CQRS_MediatR.API;
-using CQRS_MediatR.API.Filters;
 using CQRS_MediatR.API.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -32,7 +31,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-builder.Services.AddControllers(options => options.Filters.Add(typeof(LoggingAttribute)));
+builder.Services.AddControllers(options => options.Filters.Add(typeof(Logging)));
 builder.Services.AddTransient<ConsoleLogger>();
 builder.Services.AddTransient<FileLogger>();
 builder.Services.AddTransient<CombinedLogger>();

@@ -28,3 +28,18 @@ Response:
 	StatusCode: 200
 	Body: ~/users
 	Date: 22.05.2022 1:49:32
+----------------
+Request:
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 OPR/86.0.4363.64
+	Protocol: HTTP/2
+	Cookie: .AspNetCore.Antiforgery.xJc9P0y5Vf4=CfDJ8OI8Qk1diCJFtaRfpLk-Jgb3c0kES3XsChKP1prMRwkIBX-ATM1N6xvnPk2m4LLwjNldIx4y94FWwxBHlRqTWFbKSf77uyElUKxqd2_aShu2CNbwDol3jTNsnrU82_oO-iHsxKGXrB52zXRR3T7_7bU,.AspNetCore.Antiforgery.-OjDOOQOQqA=CfDJ8OI8Qk1diCJFtaRfpLk-JgY8vZpuUKU24LG3uNjvDc9crAaCn6GSh4NMyWyiI8tpJbSUyB7XkQmoH4W4UKqwdPStwH8t0ibKSijz7yWnOOfkkd_3fWFdx-GtP-OCXVhsTh0XEDeQG-bscSP27ru-3Qw,.AspNetCore.Antiforgery.v_geeJVdvqM=CfDJ8OI8Qk1diCJFtaRfpLk-JgaIy23vHOw5vlXlHbbkqx1OpDqnrELp8jSbnpuQUkuhQJohxxmD1vMZyAkLo2Di3LU8649J2sHdscKY4PG-sh8HZBLgbLgnOy6VHxHdEoc_7WKvit9qTEV-sjShPSln0GQ,.AspNetCore.Session=CfDJ8OI8Qk1diCJFtaRfpLk%2BJgZUPK7IZtp0YzUnE%2FBVKRVFHevlGAKCifXZy%2FPXLpvvofnDO%2Fe%2BTtC%2FvyCJTXt%2FdH1yp0nITnAnD%2BC4IHRxz7GuIvtx3WqWZKRyGLzlPniTC4QPrES4I%2BIW%2FdZuNVgQVUI%2Fmjc1Q0TvGqyV6HBR6YMF
+	Method: POST
+	Path: /auth/login
+	ContentType: application/x-www-form-urlencoded
+	Date: 24.05.2022 0:05:09
+----------------
+Response:
+	Cookie: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoi0JDQu9GE0ZHRgNC-0LIg0JDRgNC60LDQtNC40Lkg0JDQvdC00YDQtdC10LLQuNGHIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoibWlwZXN5bmMiLCJleHAiOjE2NTMzNDExMDksImlzcyI6IkFsZmVyb3YgSW5jLiIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNzcifQ.AQKnIeYcatjSYKNjquon-RlMoxi-zPY_2EEqIV4uWfU
+	StatusCode: 200
+	Body: 
+	Date: 24.05.2022 0:05:09

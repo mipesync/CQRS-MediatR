@@ -39,7 +39,7 @@ namespace CQRS_MediatR.API.Controllers
             if (User.Identity.IsAuthenticated) return Redirect("~/users");
             return View($"{viewUrl}LogIn.cshtml");
         }
-        
+
         [HttpPost("login")] // POST: /auth/login
         public async Task<IActionResult> LogIn([FromForm] User dataUser) // Авторизация
         {

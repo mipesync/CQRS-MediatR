@@ -7,9 +7,6 @@ namespace CQRS_MediatR.API.Filters
 {
     public class IdVerifyAttribute : Attribute, IActionFilter
     {
-        /// <summary>
-        /// Позволяет проверить валидность id паттерну
-        /// </summary>
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var id = context.HttpContext.Request.RouteValues.Values.Last()?.ToString();
